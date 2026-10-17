@@ -2,39 +2,16 @@ import os
 import zipfile
 import hashlib
 import base64
+import struct
 from datetime import datetime, timezone, timedelta
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.serialization import pkcs7
 
-
-def generate_key_and_cert():
-    # 2048-bit RSA key
-    private_key = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048
-    )
-    
-    subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Sora Music"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "Sora Android"),
-    ])
-    
-    now = datetime.now(timezone.utc)
-    cert = (
-        x509.CertificateBuilder()
-        .subject_name(subject)
-        .issuer_name(issuer)
-        .public_key(private_key.public_key())
-        .serial_number(x509.random_serial_number())
-        .not_valid_before(now - timedelta(days=1))
-        .not_valid_after(now + timedelta(days=365 * 30))
-        .sign(private_key, hashes.SHA256())
-    )
-    return private_key, cert
+from sign_v2 import generate_key_and_cert, sign_apk_v2
 
 def build_sora_apk():
     template_apk_path = "template.apk"
@@ -80,11 +57,10 @@ def build_sora_apk():
   "prefix": "https://appassets.androidplatform.net/sites/"
 }'''
 
-    # Build intermediate unsigned zip
     entries = {}
     with zipfile.ZipFile(template_apk_path, 'r') as zin:
         for item in zin.infolist():
-            # Skip old signatures and old demo/local web content
+            # Skip old signatures and demo web content
             if item.filename.startswith("META-INF/") and (
                 item.filename.endswith(".SF") or 
                 item.filename.endswith(".RSA") or 
@@ -94,7 +70,18 @@ def build_sora_apk():
                 continue
             if item.filename.startswith("assets/demo/") or item.filename.startswith("assets/local/"):
                 continue
-            entries[item.filename] = zin.read(item.filename)
+            data = zin.read(item.filename)
+            
+            # Patch resources.arsc in-place to change "My WebView" -> "Sora"
+            if item.filename == "resources.arsc":
+                old_bytes = b'\n\nMy WebView\x00'
+                new_bytes = b'\x04\x04Sora\x00' + b'\x00' * (len(old_bytes) - 7)
+                idx = data.find(old_bytes)
+                if idx != -1:
+                    data = data[:idx] + new_bytes + data[idx+len(old_bytes):]
+                    print("Patched app name to 'Sora' in resources.arsc!")
+            
+            entries[item.filename] = data
 
     # Insert Sora dist files into assets/local/
     for rel_path, content in dist_files.items():
@@ -135,7 +122,6 @@ def build_sora_apk():
     ]
     
     for name in sorted(entry_hashes.keys()):
-        # Each entry header in manifest
         section = f"Name: {name}\r\nSHA-256-Digest: {entry_hashes[name]}\r\n\r\n".encode('utf-8')
         s_hash = base64.b64encode(hashlib.sha256(section).digest()).decode('ascii')
         cert_sf_lines.append("")
@@ -145,10 +131,7 @@ def build_sora_apk():
     cert_sf_bytes = "\r\n".join(cert_sf_lines).encode('utf-8') + b"\r\n"
     entries["META-INF/CERT.SF"] = cert_sf_bytes
     
-    # 3. Create PKCS#7 / CMS signature block for META-INF/CERT.RSA
-    # We use cryptography's PKCS7 signature serialization
-    from cryptography.hazmat.primitives.serialization import pkcs7
-    
+    # 3. Create META-INF/CERT.RSA
     signature = (
         pkcs7.PKCS7SignatureBuilder()
         .set_data(cert_sf_bytes)
@@ -158,9 +141,10 @@ def build_sora_apk():
     )
     entries["META-INF/CERT.RSA"] = signature
     
-    print(f"Writing signed APK to {output_apk_path}...")
-    with zipfile.ZipFile(output_apk_path, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
-        # Write MANIFEST and signature files first (standard APK convention)
+    # Build v1 signed zip bytes
+    import io
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
         for sig_file in ["META-INF/MANIFEST.MF", "META-INF/CERT.SF", "META-INF/CERT.RSA"]:
             zout.writestr(sig_file, entries[sig_file])
             
@@ -169,8 +153,22 @@ def build_sora_apk():
                 continue
             zout.writestr(name, data)
             
+    v1_signed_apk_bytes = zip_buffer.getvalue()
+
+    # 4. Now apply APK Signature Scheme v2 (mandatory for Android 11, 12, 13, 14, 15)
+    print("Applying APK Signature Scheme v2 block...")
+    v2_signed_apk_bytes = sign_apk_v2(v1_signed_apk_bytes, private_key, cert)
+
+    with open(output_apk_path, 'wb') as fp:
+        fp.write(v2_signed_apk_bytes)
+            
     apk_size = os.path.getsize(output_apk_path)
     print(f"Success! {output_apk_path} created ({apk_size / 1024 / 1024:.2f} MB)")
+    
+    # Verify with apksigcopier
+    import apksigcopier
+    sig = apksigcopier.extract_v2_sig(output_apk_path)
+    print("APK v2 Signature verified successfully:", sig is not None)
 
 if __name__ == '__main__':
     build_sora_apk()
