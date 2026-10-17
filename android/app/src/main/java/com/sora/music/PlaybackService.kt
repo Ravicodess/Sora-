@@ -1,4 +1,4 @@
-package com.masti.music
+package com.sora.music
 
 import android.content.Intent
 import androidx.media3.common.Player

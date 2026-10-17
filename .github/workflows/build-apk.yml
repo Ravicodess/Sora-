@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'src/**'
-      - 'android/**'
-      - 'public/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
@@ -65,12 +60,14 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk Sora.apk
           ls -lh Sora.apk
 
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/heads/main')
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: v1.0.0
-          name: "Sora v1.0.0 - Apple Music Android Edition"
-          files: Sora.apk
+          name: Sora-Release-APK
+          path: Sora.apk
+
+      - name: Upload to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload v1.0.0 Sora.apk --clobber || gh release create v1.0.0 Sora.apk --title "Sora v1.0.0 - Apple Music Android Edition" --notes "Sora - Apple Music Android Edition"
