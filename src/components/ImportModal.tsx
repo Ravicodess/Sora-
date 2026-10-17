@@ -49,7 +49,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     const parsedSongs: Song[] = [];
     for (let i = 0; i < audioFiles.length; i++) {
       const file = audioFiles[i];
-      setProgressText(`Parsing tags: ${i + 1} of ${audioFiles.length} (${file.name})`);
+      setProgressText(`Indexing tags: ${i + 1} of ${audioFiles.length} (${file.name})`);
       try {
         const song = await parseAudioFile(file);
         parsedSongs.push(song);
@@ -67,7 +67,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-fade-in select-none">
-      <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/10 p-6 shadow-apple-float text-left">
+      <div className="w-full max-w-md rounded-3xl bg-[#1C1C1E] border border-white/12 p-6 shadow-apple-float text-left animate-spring-up">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
@@ -76,13 +76,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-bold text-white leading-tight">Scan Device Music</h3>
-              <p className="text-xs text-[#8E8E93]">Load local music from Android storage</p>
+              <p className="text-xs text-[#8E8E93]">Load local music into Sora</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white"
+            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white active:scale-90 transition-transform"
           >
             <X className="w-4 h-4" />
           </button>
@@ -91,7 +91,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         {/* Body */}
         <div className="py-6 space-y-4">
           <p className="text-xs text-white/70 leading-relaxed">
-            Select an audio folder on your device (such as <code className="text-[#FA233B]">/Music</code> or <code className="text-[#FA233B]">/Download</code>) or pick multiple music files. ID3 metadata, album art, and lossy/lossless bitrates will be indexed automatically into Masti Music.
+            Choose an audio folder on your Android device (such as <code className="text-[#FA233B]">/Music</code> or <code className="text-[#FA233B]">/Download</code>) or select files directly. Sora extracts ID3 tags and embedded artwork automatically.
           </p>
 
           {isProcessing ? (
@@ -103,11 +103,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             <div className="flex flex-col items-center justify-center py-6 space-y-2 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl">
               <CheckCircle2 className="w-8 h-8 text-emerald-400" />
               <p className="text-sm font-semibold text-white">
-                Successfully Imported {importedCount} Songs!
+                Indexed {importedCount} Songs into Sora!
               </p>
               <button
                 onClick={onClose}
-                className="mt-2 px-5 py-2 rounded-full bg-[#FA233B] text-white text-xs font-bold hover:bg-[#ff3b50] active:scale-95 transition-all"
+                className="mt-2 px-5 py-2 rounded-full bg-[#FA233B] text-white text-xs font-bold hover:bg-[#ff3b50] active:scale-95 transition-all shadow-apple-glow"
               >
                 Go to Library
               </button>
@@ -119,7 +119,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 onClick={() => folderInputRef.current?.click()}
                 className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 active:scale-95 transition-all group"
               >
-                <FolderDown className="w-8 h-8 text-[#FA233B] mb-2 group-hover:scale-110 transition-transform" />
+                <FolderDown className="w-8 h-8 text-[#FA233B] mb-2 group-hover:scale-110 transition-transform duration-300" />
                 <span className="text-sm font-semibold text-white">Scan Music Folder</span>
                 <span className="text-[10px] text-[#8E8E93] mt-0.5">Whole directory scan</span>
               </button>
@@ -129,7 +129,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 onClick={() => fileInputRef.current?.click()}
                 className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 active:scale-95 transition-all group"
               >
-                <FileAudio className="w-8 h-8 text-white/80 mb-2 group-hover:scale-110 transition-transform" />
+                <FileAudio className="w-8 h-8 text-white/80 mb-2 group-hover:scale-110 transition-transform duration-300" />
                 <span className="text-sm font-semibold text-white">Select Audio Files</span>
                 <span className="text-[10px] text-[#8E8E93] mt-0.5">MP3, M4A, FLAC, WAV</span>
               </button>

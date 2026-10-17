@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -11,56 +17,93 @@
 
 /* Apple Music glassmorphism blur backgrounds */
 .apple-glass {
-  background: rgba(28, 28, 30, 0.78);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  background: rgba(20, 20, 22, 0.82);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
   border-top: 0.5px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.4s var(--ease-spring), opacity 0.3s ease;
 }
 
 .apple-glass-card {
-  background: rgba(36, 36, 38, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(32, 32, 36, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
 }
 
 .apple-glass-pill {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 /* Fluid Mesh Gradient Animation for Apple Music Now Playing */
 @keyframes fluidOrb1 {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(60px, -80px) scale(1.25); }
-  66% { transform: translate(-40px, 40px) scale(0.85); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(70px, -90px) scale(1.25) rotate(120deg); }
+  66% { transform: translate(-50px, 50px) scale(0.85) rotate(240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
 }
 
 @keyframes fluidOrb2 {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(-70px, 60px) scale(0.9); }
-  66% { transform: translate(50px, -50px) scale(1.3); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(-80px, 70px) scale(0.9) rotate(-120deg); }
+  66% { transform: translate(60px, -60px) scale(1.3) rotate(-240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(-360deg); }
 }
 
 @keyframes fluidOrb3 {
   0% { transform: translate(0px, 0px) scale(1.1); }
-  50% { transform: translate(40px, 50px) scale(0.95); }
+  50% { transform: translate(50px, 60px) scale(0.92); }
   100% { transform: translate(0px, 0px) scale(1.1); }
 }
 
 .animate-orb-1 {
-  animation: fluidOrb1 18s ease-in-out infinite alternate;
+  animation: fluidOrb1 24s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .animate-orb-2 {
-  animation: fluidOrb2 22s ease-in-out infinite alternate;
+  animation: fluidOrb2 28s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .animate-orb-3 {
-  animation: fluidOrb3 15s ease-in-out infinite alternate;
+  animation: fluidOrb3 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Modal Spring Slide-Up */
+@keyframes springSlideUp {
+  0% {
+    transform: translateY(100%) scale(0.96);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0%) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-spring-up {
+  animation: springSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Subtle view cross-fade */
+@keyframes viewFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-view {
+  animation: viewFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Hide scrollbar on mobile views while keeping scrollability */
@@ -72,11 +115,19 @@
   scrollbar-width: none;
 }
 
-/* Apple squircle border radius */
+/* Apple squircle smooth border radius */
 .apple-squircle {
   border-radius: 22.5%;
 }
 
 .apple-squircle-sm {
   border-radius: 18%;
+}
+
+/* Smooth spring touch feedback */
+.active-press {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.active-press:active {
+  transform: scale(0.94);
 }

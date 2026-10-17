@@ -1,7 +1,6 @@
 import { Song, Playlist } from '../types/music';
-import { INITIAL_SONGS, INITIAL_PLAYLISTS } from './mockData';
 
-const DB_NAME = 'masti_music_db';
+const DB_NAME = 'sora_music_db';
 const DB_VERSION = 1;
 const STORE_SONGS = 'songs';
 const STORE_PLAYLISTS = 'playlists';
@@ -11,7 +10,7 @@ class StorageService {
   private db: IDBDatabase | null = null;
 
   async init(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
@@ -27,45 +26,29 @@ class StorageService {
         }
       };
 
-      request.onsuccess = async () => {
+      request.onsuccess = () => {
         this.db = request.result;
-        await this.seedDefaultsIfNeeded();
         resolve();
       };
 
       request.onerror = () => {
         console.error('IndexedDB failed to open:', request.error);
-        resolve(); // resolve anyway so app continues working
+        resolve();
       };
     });
   }
 
-  private async seedDefaultsIfNeeded(): Promise<void> {
-    const existingSongs = await this.getAllSongs();
-    if (existingSongs.length === 0) {
-      for (const song of INITIAL_SONGS) {
-        await this.saveSong(song);
-      }
-    }
-    const existingPlaylists = await this.getAllPlaylists();
-    if (existingPlaylists.length === 0) {
-      for (const pl of INITIAL_PLAYLISTS) {
-        await this.savePlaylist(pl);
-      }
-    }
-  }
-
   async getAllSongs(): Promise<Song[]> {
-    if (!this.db) return INITIAL_SONGS;
+    if (!this.db) return [];
     return new Promise((resolve) => {
       try {
         const tx = this.db!.transaction(STORE_SONGS, 'readonly');
         const store = tx.objectStore(STORE_SONGS);
         const req = store.getAll();
         req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => resolve(INITIAL_SONGS);
+        req.onerror = () => resolve([]);
       } catch {
-        resolve(INITIAL_SONGS);
+        resolve([]);
       }
     });
   }
@@ -118,16 +101,16 @@ class StorageService {
   }
 
   async getAllPlaylists(): Promise<Playlist[]> {
-    if (!this.db) return INITIAL_PLAYLISTS;
+    if (!this.db) return [];
     return new Promise((resolve) => {
       try {
         const tx = this.db!.transaction(STORE_PLAYLISTS, 'readonly');
         const store = tx.objectStore(STORE_PLAYLISTS);
         const req = store.getAll();
         req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => resolve(INITIAL_PLAYLISTS);
+        req.onerror = () => resolve([]);
       } catch {
-        resolve(INITIAL_PLAYLISTS);
+        resolve([]);
       }
     });
   }
@@ -147,28 +130,13 @@ class StorageService {
     });
   }
 
-  async getSetting<T>(key: string, defaultValue: T): Promise<T> {
-    if (!this.db) return defaultValue;
-    return new Promise((resolve) => {
-      try {
-        const tx = this.db!.transaction(STORE_SETTINGS, 'readonly');
-        const store = tx.objectStore(STORE_SETTINGS);
-        const req = store.get(key);
-        req.onsuccess = () => resolve(req.result ? req.result.value : defaultValue);
-        req.onerror = () => resolve(defaultValue);
-      } catch {
-        resolve(defaultValue);
-      }
-    });
-  }
-
-  async setSetting<T>(key: string, value: T): Promise<void> {
+  async clearAll(): Promise<void> {
     if (!this.db) return;
     return new Promise((resolve) => {
       try {
-        const tx = this.db!.transaction(STORE_SETTINGS, 'readwrite');
-        const store = tx.objectStore(STORE_SETTINGS);
-        store.put({ key, value });
+        const tx = this.db!.transaction([STORE_SONGS, STORE_PLAYLISTS], 'readwrite');
+        tx.objectStore(STORE_SONGS).clear();
+        tx.objectStore(STORE_PLAYLISTS).clear();
         tx.oncomplete = () => resolve();
         tx.onerror = () => resolve();
       } catch {

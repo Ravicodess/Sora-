@@ -89,7 +89,6 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  // Remaining time format: -mm:ss
   const formatRemainingTime = (current: number, total: number) => {
     const diff = Math.max(0, total - current);
     return `-${formatTime(diff)}`;
@@ -107,80 +106,79 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
   if (!isOpen || !currentSong) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col justify-between overflow-hidden bg-black select-none text-white animate-slide-up">
+    <div className="fixed inset-0 z-40 flex flex-col justify-between overflow-hidden bg-black select-none text-white animate-spring-up">
       {/* Dynamic Fluid Mesh Gradient Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-80">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-85">
         <div
-          className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] blur-[120px] transition-all duration-1000 ease-out"
+          className="absolute -top-[25%] -left-[25%] w-[150%] h-[150%] blur-[130px] transition-all duration-1000 ease-out"
           style={{
-            background: `radial-gradient(circle at 30% 30%, ${colors.primary} 0%, transparent 60%),
-                         radial-gradient(circle at 70% 70%, ${colors.secondary} 0%, transparent 60%),
+            background: `radial-gradient(circle at 25% 25%, ${colors.primary} 0%, transparent 60%),
+                         radial-gradient(circle at 75% 75%, ${colors.secondary} 0%, transparent 60%),
                          radial-gradient(circle at 50% 50%, ${colors.accent} 0%, #000000 85%)`
           }}
         />
 
-        {/* Ambient floating orbs for organic Apple Music fluid motion */}
+        {/* Floating smooth blur orbs for organic fluid motion */}
         <div
-          className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-[90px] animate-orb-1 opacity-70"
+          className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-[100px] animate-orb-1 opacity-70"
           style={{ backgroundColor: colors.primary }}
         />
         <div
-          className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full blur-[100px] animate-orb-2 opacity-60"
+          className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full blur-[110px] animate-orb-2 opacity-65"
           style={{ backgroundColor: colors.secondary }}
         />
         <div
-          className="absolute top-1/2 left-1/3 w-72 h-72 rounded-full blur-[80px] animate-orb-3 opacity-50"
+          className="absolute top-1/2 left-1/3 w-72 h-72 rounded-full blur-[90px] animate-orb-3 opacity-50"
           style={{ backgroundColor: colors.accent }}
         />
 
-        {/* Dark vignette overlay for Apple high-contrast readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/85" />
       </div>
 
-      {/* Top Header Bar */}
+      {/* Top Header Drag Bar & Dismiss */}
       <div className="relative z-10 flex items-center justify-between px-6 pt-[calc(env(safe-area-inset-top,16px)+12px)] pb-3">
         <button
           onClick={onClose}
-          className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-transform"
+          className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white active:scale-90 transition-transform duration-200"
           aria-label="Dismiss"
         >
           <ChevronDown className="w-6 h-6" />
         </button>
 
-        {/* Playing from label */}
+        {/* Centered track context info */}
         <div className="flex flex-col items-center max-w-[200px] truncate text-center">
           <span className="text-[10px] uppercase font-bold tracking-widest text-white/50">
             Playing From
           </span>
           <span className="text-xs font-semibold text-white/90 truncate">
-            {currentSong.album || 'Local Device Audio'}
+            {currentSong.album || 'Local Storage'}
           </span>
         </div>
 
         <button
-          className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-transform"
+          className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white active:scale-90 transition-transform duration-200"
           aria-label="More options"
         >
           <MoreHorizontal className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Center Body: Cover Art / Lyrics / Queue */}
+      {/* Center Body: Cover / Lyrics / Queue */}
       <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-8 min-h-0">
         {activeTab === 'cover' && (
-          <div className="w-full flex flex-col items-center justify-center my-auto">
-            {/* Squircle Album Artwork with micro-interaction scale */}
+          <div className="w-full flex flex-col items-center justify-center my-auto transition-all duration-500 ease-out">
+            {/* Squircle Album Artwork with micro-interaction spring scale */}
             <div
-              className={`relative w-64 h-64 sm:w-72 sm:h-72 max-w-[75vw] max-h-[75vw] aspect-square transition-all duration-700 ease-out ${
+              className={`relative w-64 h-64 sm:w-76 sm:h-76 max-w-[76vw] max-h-[76vw] aspect-square transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isPlaying
-                  ? 'scale-100 shadow-[0_24px_50px_rgba(0,0,0,0.7)]'
-                  : 'scale-90 opacity-90 shadow-[0_12px_30px_rgba(0,0,0,0.5)]'
+                  ? 'scale-100 shadow-[0_28px_60px_rgba(0,0,0,0.75)]'
+                  : 'scale-90 opacity-90 shadow-[0_14px_35px_rgba(0,0,0,0.5)]'
               }`}
             >
               <img
                 src={currentSong.coverUrl}
                 alt={currentSong.title}
-                className="w-full h-full rounded-[24px] object-cover border border-white/15"
+                className="w-full h-full rounded-[26px] object-cover border border-white/15"
               />
 
               {/* Lossless Apple Music Badge */}
@@ -195,7 +193,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
         )}
 
         {activeTab === 'lyrics' && (
-          <div className="w-full h-full">
+          <div className="w-full h-full animate-view">
             <SyncedLyrics
               lyrics={currentSong.lyrics}
               currentTime={currentTime}
@@ -205,7 +203,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
         )}
 
         {activeTab === 'queue' && (
-          <div className="w-full h-full">
+          <div className="w-full h-full animate-view">
             <QueueDrawer
               currentSong={currentSong}
               queue={queue}
@@ -238,10 +236,10 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
             aria-label="Favorite"
           >
             <Heart
-              className={`w-6 h-6 transition-colors ${
+              className={`w-6 h-6 transition-all duration-300 ${
                 currentSong.isFavorite
-                  ? 'fill-[#FA233B] text-[#FA233B]'
-                  : 'text-white/60'
+                  ? 'fill-[#FA233B] text-[#FA233B] scale-110'
+                  : 'text-white/60 scale-100'
               }`}
             />
           </button>
@@ -255,7 +253,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
             max={duration || 100}
             value={currentTime}
             onChange={(e) => onSeek(Number(e.target.value))}
-            className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none"
+            className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none transition-all"
           />
 
           <div className="flex justify-between text-[11px] font-semibold text-white/60 tabular-nums">
@@ -264,12 +262,12 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           </div>
         </div>
 
-        {/* Transport Playback Controls */}
+        {/* Transport Playback Controls with Spring Easing */}
         <div className="flex items-center justify-between px-2">
           {/* Shuffle */}
           <button
             onClick={onToggleShuffle}
-            className={`p-2 transition-colors active:scale-90 ${
+            className={`p-2 transition-transform duration-200 active:scale-90 ${
               isShuffle ? 'text-[#FA233B]' : 'text-white/50 hover:text-white'
             }`}
             aria-label="Shuffle"
@@ -280,16 +278,16 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* Previous */}
           <button
             onClick={onPrevious}
-            className="p-3 text-white hover:text-white/80 active:scale-90 transition-transform"
+            className="p-3 text-white hover:text-white/80 active:scale-90 transition-transform duration-200"
             aria-label="Previous track"
           >
             <SkipBack className="w-8 h-8 fill-current" />
           </button>
 
-          {/* Play / Pause Giant Button */}
+          {/* Giant Play / Pause Button with Spring Feedback */}
           <button
             onClick={onTogglePlay}
-            className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-apple-float active:scale-95 transition-transform"
+            className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-apple-float active:scale-90 transition-transform duration-200"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
@@ -302,7 +300,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* Next */}
           <button
             onClick={onNext}
-            className="p-3 text-white hover:text-white/80 active:scale-90 transition-transform"
+            className="p-3 text-white hover:text-white/80 active:scale-90 transition-transform duration-200"
             aria-label="Next track"
           >
             <SkipForward className="w-8 h-8 fill-current" />
@@ -311,7 +309,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* Repeat */}
           <button
             onClick={onToggleRepeat}
-            className={`p-2 transition-colors active:scale-90 relative ${
+            className={`p-2 transition-transform duration-200 active:scale-90 relative ${
               repeatMode !== 'off' ? 'text-[#FA233B]' : 'text-white/50 hover:text-white'
             }`}
             aria-label="Repeat mode"
@@ -351,9 +349,9 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* Synced Lyrics Button */}
           <button
             onClick={() => setActiveTab(activeTab === 'lyrics' ? 'cover' : 'lyrics')}
-            className={`p-2.5 rounded-full transition-colors active:scale-90 ${
+            className={`p-2.5 rounded-full transition-all duration-200 active:scale-90 ${
               activeTab === 'lyrics'
-                ? 'bg-white/25 text-white'
+                ? 'bg-white/25 text-white scale-105'
                 : 'text-white/60 hover:text-white'
             }`}
             aria-label="Lyrics"
@@ -364,7 +362,7 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* AirPlay / Output Route Button */}
           <button
             onClick={() => setIsAirPlayOpen(true)}
-            className="p-2.5 rounded-full text-white/60 hover:text-white transition-colors active:scale-90"
+            className="p-2.5 rounded-full text-white/60 hover:text-white transition-all duration-200 active:scale-90"
             aria-label="AirPlay"
           >
             <Airplay className="w-5 h-5" />
@@ -373,9 +371,9 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
           {/* Up Next Queue Button */}
           <button
             onClick={() => setActiveTab(activeTab === 'queue' ? 'cover' : 'queue')}
-            className={`p-2.5 rounded-full transition-colors active:scale-90 ${
+            className={`p-2.5 rounded-full transition-all duration-200 active:scale-90 ${
               activeTab === 'queue'
-                ? 'bg-white/25 text-white'
+                ? 'bg-white/25 text-white scale-105'
                 : 'text-white/60 hover:text-white'
             }`}
             aria-label="Queue"

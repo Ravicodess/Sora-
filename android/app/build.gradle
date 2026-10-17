@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.masti.music'
+    namespace 'com.sora.music'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.masti.music"
+        applicationId "com.sora.music"
         minSdk 24
         targetSdk 34
         versionCode 1

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Song } from '../types/music';
 import { RADIO_STATIONS } from '../services/mockData';
-import { Radio as RadioIcon, Play, Flame, Waves } from 'lucide-react';
+import { Radio as RadioIcon, Play, Waves } from 'lucide-react';
 
 interface RadioViewProps {
   songs: Song[];
@@ -15,7 +15,7 @@ export const RadioView: React.FC<RadioViewProps> = ({
   onPlaySong
 }) => {
   return (
-    <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-7 select-none text-left">
+    <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-7 select-none text-left animate-view">
       {/* Header */}
       <div className="pt-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2.5">
@@ -28,13 +28,13 @@ export const RadioView: React.FC<RadioViewProps> = ({
       {/* Hero Apple Music 1 Live Broadcast Station */}
       <div
         onClick={() => songs.length > 0 && onPlaySong(songs[0])}
-        className="relative rounded-3xl overflow-hidden cursor-pointer group shadow-apple-card border border-white/10"
+        className="relative rounded-3xl overflow-hidden cursor-pointer group shadow-apple-card border border-white/10 transition-transform duration-300 active:scale-[0.98]"
       >
         <div className="h-64 sm:h-72 w-full relative">
           <img
             src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80"
             alt="Apple Music 1"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-6 flex flex-col justify-between">
             <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ export const RadioView: React.FC<RadioViewProps> = ({
           </div>
 
           <button
-            className="absolute right-5 bottom-5 w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-apple-float opacity-90 group-hover:opacity-100 group-hover:scale-105 active:scale-95 transition-all"
+            className="absolute right-5 bottom-5 w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-apple-float opacity-90 group-hover:opacity-100 group-hover:scale-105 active:scale-90 transition-all duration-200"
             aria-label="Play Live Radio"
           >
             <Play className="w-6 h-6 fill-black text-black ml-0.5" />
@@ -74,7 +74,7 @@ export const RadioView: React.FC<RadioViewProps> = ({
         </div>
       </div>
 
-      {/* Live & On-Air Stations Grid */}
+      {/* Curated Stations */}
       <div className="space-y-3">
         <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
           <Waves className="w-4 h-4 text-[#FA233B]" />
@@ -86,13 +86,13 @@ export const RadioView: React.FC<RadioViewProps> = ({
             <div
               key={station.id}
               onClick={() => songs.length > 0 && onPlaySong(songs[i % songs.length])}
-              className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#1C1C1E]/80 hover:bg-[#2C2C2E]/80 border border-white/10 cursor-pointer group transition-all"
+              className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#1C1C1E]/80 hover:bg-[#2C2C2E]/80 border border-white/10 cursor-pointer group transition-all duration-300 active:scale-[0.98]"
             >
               <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
                 <img
                   src={station.coverUrl}
                   alt={station.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <Play className="w-6 h-6 fill-white text-white ml-0.5" />

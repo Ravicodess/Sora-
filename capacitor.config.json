@@ -1,6 +1,6 @@
 {
-  "appId": "com.masti.music",
-  "appName": "Masti Music",
+  "appId": "com.sora.music",
+  "appName": "Sora",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

@@ -100,78 +100,108 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
     const displayedSongs = activeCategory === 'downloaded' ? localSongs : songs;
 
     return (
-      <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-5 select-none text-left">
+      <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-5 select-none text-left animate-view">
         {/* Sub-header with back arrow */}
         <div className="flex items-center justify-between pt-2">
           <button
             onClick={() => setActiveCategory('main')}
-            className="flex items-center gap-1 text-sm font-semibold text-[#FA233B] hover:text-[#ff4f64] transition-colors"
+            className="flex items-center gap-1 text-sm font-semibold text-[#FA233B] hover:text-[#ff4f64] transition-colors active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
             <span>Library</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onPlayAlbum(displayedSongs)}
-              className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
-              title="Play All"
-            >
-              <Play className="w-4 h-4 fill-white ml-0.5" />
-            </button>
-            <button
-              onClick={() => {
-                const shuffled = [...displayedSongs].sort(() => Math.random() - 0.5);
-                onPlayAlbum(shuffled);
-              }}
-              className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
-              title="Shuffle All"
-            >
-              <Shuffle className="w-4 h-4" />
-            </button>
-          </div>
+          {displayedSongs.length > 0 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onPlayAlbum(displayedSongs)}
+                className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-90 transition-transform"
+                title="Play All"
+              >
+                <Play className="w-4 h-4 fill-white ml-0.5" />
+              </button>
+              <button
+                onClick={() => {
+                  const shuffled = [...displayedSongs].sort(() => Math.random() - 0.5);
+                  onPlayAlbum(shuffled);
+                }}
+                className="p-2 rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-90 transition-transform"
+                title="Shuffle All"
+              >
+                <Shuffle className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         <h1 className="text-2xl font-bold tracking-tight text-white">{title}</h1>
 
         {/* Albums sub-view */}
         {activeCategory === 'albums' && (
-          <div className="grid grid-cols-2 gap-4">
-            {albumsList.map((alb, i) => (
-              <AlbumCard
-                key={i}
-                title={alb.title}
-                subtitle={`${alb.artist} • ${alb.songs.length} tracks`}
-                coverUrl={alb.coverUrl}
-                onPlay={() => onPlayAlbum(alb.songs)}
-              />
-            ))}
+          <div>
+            {albumsList.length === 0 ? (
+              <div className="py-16 text-center text-white/40 space-y-3">
+                <p className="text-sm">No albums found in device storage</p>
+                <button
+                  onClick={onOpenImport}
+                  className="px-5 py-2.5 rounded-full bg-[#FA233B] text-white text-xs font-bold active:scale-95 transition-all shadow-apple-glow"
+                >
+                  Scan Device Storage
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {albumsList.map((alb, i) => (
+                  <AlbumCard
+                    key={i}
+                    title={alb.title}
+                    subtitle={`${alb.artist} • ${alb.songs.length} tracks`}
+                    coverUrl={alb.coverUrl}
+                    onPlay={() => onPlayAlbum(alb.songs)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {/* Artists sub-view */}
         {activeCategory === 'artists' && (
-          <div className="divide-y divide-white/5 bg-[#1C1C1E]/60 rounded-2xl border border-white/10 p-2">
-            {artistsList.map((art, i) => (
-              <div
-                key={i}
-                onClick={() => onPlayAlbum(art.songs)}
-                className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={art.coverUrl}
-                    alt={art.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <h4 className="text-base font-semibold text-white">{art.name}</h4>
-                    <p className="text-xs text-[#8E8E93]">{art.count} songs</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/30" />
+          <div>
+            {artistsList.length === 0 ? (
+              <div className="py-16 text-center text-white/40 space-y-3">
+                <p className="text-sm">No artists found in device storage</p>
+                <button
+                  onClick={onOpenImport}
+                  className="px-5 py-2.5 rounded-full bg-[#FA233B] text-white text-xs font-bold active:scale-95 transition-all shadow-apple-glow"
+                >
+                  Scan Device Storage
+                </button>
               </div>
-            ))}
+            ) : (
+              <div className="divide-y divide-white/5 bg-[#1C1C1E]/60 rounded-2xl border border-white/10 p-2">
+                {artistsList.map((art, i) => (
+                  <div
+                    key={i}
+                    onClick={() => onPlayAlbum(art.songs)}
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 cursor-pointer active:scale-[0.99] transition-transform"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={art.coverUrl}
+                        alt={art.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h4 className="text-base font-semibold text-white">{art.name}</h4>
+                        <p className="text-xs text-[#8E8E93]">{art.count} songs</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-white/30" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -183,7 +213,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 <p className="text-sm">No music files found in this section</p>
                 <button
                   onClick={onOpenImport}
-                  className="px-4 py-2 rounded-full bg-[#FA233B] text-white text-xs font-bold"
+                  className="px-5 py-2.5 rounded-full bg-[#FA233B] text-white text-xs font-bold active:scale-95 transition-all shadow-apple-glow"
                 >
                   Scan Device Storage
                 </button>
@@ -210,19 +240,33 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
         {/* Playlists sub-view */}
         {activeCategory === 'playlists' && (
-          <div className="grid grid-cols-2 gap-4">
-            {playlists.map((pl) => (
-              <AlbumCard
-                key={pl.id}
-                title={pl.name}
-                subtitle={`${pl.songIds.length} songs`}
-                coverUrl={pl.coverUrl || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80'}
-                onPlay={() => {
-                  const plSongs = songs.filter((s) => pl.songIds.includes(s.id));
-                  onPlayAlbum(plSongs.length ? plSongs : songs);
-                }}
-              />
-            ))}
+          <div>
+            {playlists.length === 0 ? (
+              <div className="py-16 text-center text-white/40 space-y-3">
+                <p className="text-sm">No playlists created yet</p>
+                <button
+                  onClick={onOpenImport}
+                  className="px-5 py-2.5 rounded-full bg-[#FA233B] text-white text-xs font-bold active:scale-95 transition-all shadow-apple-glow"
+                >
+                  Import Local Songs
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {playlists.map((pl) => (
+                  <AlbumCard
+                    key={pl.id}
+                    title={pl.name}
+                    subtitle={`${pl.songIds.length} songs`}
+                    coverUrl={pl.coverUrl || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80'}
+                    onPlay={() => {
+                      const plSongs = songs.filter((s) => pl.songIds.includes(s.id));
+                      onPlayAlbum(plSongs.length ? plSongs : songs);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -231,7 +275,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
   // Main Library View
   return (
-    <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-6 select-none text-left">
+    <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-6 select-none text-left animate-view">
       {/* Top Header */}
       <div className="flex items-center justify-between pt-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
@@ -240,7 +284,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
         <button
           onClick={onOpenImport}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FA233B] text-xs font-bold text-white active:scale-95 transition-all shadow-apple-glow"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FA233B] text-xs font-bold text-white active:scale-95 transition-all shadow-apple-glow"
         >
           <FolderPlus className="w-3.5 h-3.5" />
           <span>Import Music</span>
@@ -253,7 +297,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
           <div
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
-            className="flex items-center justify-between py-3.5 px-1 hover:bg-white/5 cursor-pointer group transition-colors"
+            className="flex items-center justify-between py-3.5 px-1 hover:bg-white/5 cursor-pointer group transition-colors active:scale-[0.99]"
           >
             <div className="flex items-center gap-3.5">
               <div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors">
@@ -276,23 +320,30 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         ))}
       </div>
 
-      {/* Recently Added 2-column Grid */}
+      {/* Recently Added Section */}
       <div className="space-y-3 pt-2">
         <h2 className="text-xl font-bold tracking-tight text-white">
           Recently Added
         </h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          {albumsList.slice(0, 6).map((alb, i) => (
-            <AlbumCard
-              key={i}
-              title={alb.title}
-              subtitle={alb.artist}
-              coverUrl={alb.coverUrl}
-              onPlay={() => onPlayAlbum(alb.songs)}
-            />
-          ))}
-        </div>
+        {albumsList.length === 0 ? (
+          <div className="py-10 text-center text-[#8E8E93] bg-[#1C1C1E]/40 rounded-2xl border border-white/5 p-4">
+            <p className="text-sm font-semibold text-white">No albums scanned</p>
+            <p className="text-xs mt-1">Tap "Import Music" above to add your local MP3s & FLACs.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {albumsList.slice(0, 6).map((alb, i) => (
+              <AlbumCard
+                key={i}
+                title={alb.title}
+                subtitle={alb.artist}
+                coverUrl={alb.coverUrl}
+                onPlay={() => onPlayAlbum(alb.songs)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
