@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="appleMusicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FC3C44"/>
+      <stop offset="50%" stop-color="#FA233B"/>
+      <stop offset="100%" stop-color="#EB1A3A"/>
+    </linearGradient>
+  </defs>
+  <!-- Apple squircle background -->
+  <rect width="512" height="512" rx="115" fill="url(#appleMusicGrad)"/>
+  <!-- Musical note -->
+  <path fill="#FFFFFF" d="M360 115v194.2c-7.3-4.2-16-6.6-25.5-6.6-30.7 0-55.5 20.8-55.5 46.5 0 25.6 24.9 46.5 55.5 46.5 30.7 0 55.5-20.8 55.5-46.5V192.8l-155 35.8v144c-7.3-4.2-16-6.6-25.5-6.6-30.7 0-55.5 20.8-55.5 46.5 0 25.6 24.9 46.5 55.5 46.5 30.7 0 55.5-20.8 55.5-46.5V148.5c0-15.5 11.2-28.5 26.5-31.5l129.5-29c12.2-2.7 24 6.5 24 19z"/>
+</svg>

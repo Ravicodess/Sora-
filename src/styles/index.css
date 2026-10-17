@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Apple Music glassmorphism blur backgrounds */
+.apple-glass {
+  background: rgba(28, 28, 30, 0.78);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.apple-glass-card {
+  background: rgba(36, 36, 38, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.apple-glass-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Fluid Mesh Gradient Animation for Apple Music Now Playing */
+@keyframes fluidOrb1 {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(60px, -80px) scale(1.25); }
+  66% { transform: translate(-40px, 40px) scale(0.85); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes fluidOrb2 {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-70px, 60px) scale(0.9); }
+  66% { transform: translate(50px, -50px) scale(1.3); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes fluidOrb3 {
+  0% { transform: translate(0px, 0px) scale(1.1); }
+  50% { transform: translate(40px, 50px) scale(0.95); }
+  100% { transform: translate(0px, 0px) scale(1.1); }
+}
+
+.animate-orb-1 {
+  animation: fluidOrb1 18s ease-in-out infinite alternate;
+}
+
+.animate-orb-2 {
+  animation: fluidOrb2 22s ease-in-out infinite alternate;
+}
+
+.animate-orb-3 {
+  animation: fluidOrb3 15s ease-in-out infinite alternate;
+}
+
+/* Hide scrollbar on mobile views while keeping scrollability */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Apple squircle border radius */
+.apple-squircle {
+  border-radius: 22.5%;
+}
+
+.apple-squircle-sm {
+  border-radius: 18%;
+}
