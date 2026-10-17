@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                     uris.add(clipData.getItemAt(i).uri)
                 }
             } else if (intent.data != null) {
-                uris.add(intent.data!)
+                uris.add(intent.data!!)
             }
 
             callback.onReceiveValue(if (uris.isNotEmpty()) uris.toTypedArray() else null)
