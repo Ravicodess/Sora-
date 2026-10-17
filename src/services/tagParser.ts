@@ -79,7 +79,7 @@ export function getAudioDuration(url: string): Promise<number> {
 }
 
 // Clean filename into Artist & Title
-function parseFromFilename(fileName: string): { title: string; artist: string; album: string } {
+export function parseFromFilename(fileName: string): { title: string; artist: string; album: string } {
   const cleanName = fileName.replace(/\.[^/.]+$/, '').trim(); // remove extension
 
   // Patterns like "01 - Artist - Title" or "Artist - Title"

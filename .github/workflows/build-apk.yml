@@ -29,6 +29,11 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci || npm install
 
+      - name: Run Type Checking & Automated Tests
+        run: |
+          npm run type-check
+          npm test
+
       - name: Build Web Production Assets
         run: npm run build
 

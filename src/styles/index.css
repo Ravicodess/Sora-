@@ -131,3 +131,33 @@
 .active-press:active {
   transform: scale(0.94);
 }
+
+/* Accessible visible focus indicators */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #FA233B;
+  outline-offset: 2px;
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-orb-1,
+  .animate-orb-2,
+  .animate-orb-3 {
+    animation: none !important;
+    transform: none !important;
+  }
+  .animate-spring-up {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

@@ -7,13 +7,36 @@ interface RadioViewProps {
   songs: Song[];
   isPlaying: boolean;
   onPlaySong: (song: Song) => void;
+  onPlayAlbum?: (songs: Song[]) => void;
+  onOpenImport?: () => void;
+  showToast?: (message: string) => void;
 }
 
 export const RadioView: React.FC<RadioViewProps> = ({
   songs,
   isPlaying,
-  onPlaySong
+  onPlaySong,
+  onPlayAlbum,
+  onOpenImport,
+  showToast
 }) => {
+  const handleStationPlay = (stationTitle: string, stationSeedIndex: number = 0) => {
+    if (songs.length === 0) {
+      showToast?.(`Scan your local music to tune into ${stationTitle}`);
+      onOpenImport?.();
+      return;
+    }
+
+    // Create an intelligent station mix by shuffling songs deterministically from the seed
+    const mix = [...songs].sort(() => Math.random() - 0.5);
+    if (onPlayAlbum) {
+      onPlayAlbum(mix);
+    } else {
+      onPlaySong(mix[0]);
+    }
+    showToast?.(`Tuned into ${stationTitle}`);
+  };
+
   return (
     <div className="pb-32 pt-14 px-4 max-w-xl mx-auto space-y-7 select-none text-left animate-view">
       {/* Header */}
@@ -22,13 +45,22 @@ export const RadioView: React.FC<RadioViewProps> = ({
           <span>Radio</span>
           <RadioIcon className="w-6 h-6 text-[#FA233B]" />
         </h1>
-        <p className="text-xs text-[#8E8E93] mt-0.5">Live broadcasts, DJ sets, and artist stations</p>
+        <p className="text-xs text-[#8E8E93] mt-0.5">Live broadcasts, DJ sets, and station mixes</p>
       </div>
 
       {/* Hero Apple Music 1 Live Broadcast Station */}
       <div
-        onClick={() => songs.length > 0 && onPlaySong(songs[0])}
+        role="button"
+        tabIndex={0}
+        onClick={() => handleStationPlay('Apple Music 1', 0)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleStationPlay('Apple Music 1', 0);
+          }
+        }}
         className="relative rounded-3xl overflow-hidden cursor-pointer group shadow-apple-card border border-white/10 transition-transform duration-300 active:scale-[0.98]"
+        aria-label="Tune into Apple Music 1"
       >
         <div className="h-64 sm:h-72 w-full relative">
           <img
@@ -85,8 +117,17 @@ export const RadioView: React.FC<RadioViewProps> = ({
           {RADIO_STATIONS.map((station, i) => (
             <div
               key={station.id}
-              onClick={() => songs.length > 0 && onPlaySong(songs[i % songs.length])}
+              role="button"
+              tabIndex={0}
+              onClick={() => handleStationPlay(station.name, i + 1)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleStationPlay(station.name, i + 1);
+                }
+              }}
               className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#1C1C1E]/80 hover:bg-[#2C2C2E]/80 border border-white/10 cursor-pointer group transition-all duration-300 active:scale-[0.98]"
+              aria-label={`Tune into ${station.name}`}
             >
               <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-md">
                 <img

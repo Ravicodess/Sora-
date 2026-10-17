@@ -142,13 +142,50 @@ class StorageService {
     });
   }
 
+  async getSetting<T>(key: string, defaultValue: T): Promise<T> {
+    if (!this.db) return defaultValue;
+    return new Promise((resolve) => {
+      try {
+        const tx = this.db!.transaction(STORE_SETTINGS, 'readonly');
+        const store = tx.objectStore(STORE_SETTINGS);
+        const req = store.get(key);
+        req.onsuccess = () => {
+          if (req.result && req.result.value !== undefined) {
+            resolve(req.result.value as T);
+          } else {
+            resolve(defaultValue);
+          }
+        };
+        req.onerror = () => resolve(defaultValue);
+      } catch {
+        resolve(defaultValue);
+      }
+    });
+  }
+
+  async saveSetting<T>(key: string, value: T): Promise<void> {
+    if (!this.db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = this.db!.transaction(STORE_SETTINGS, 'readwrite');
+        const store = tx.objectStore(STORE_SETTINGS);
+        store.put({ key, value });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch {
+        resolve();
+      }
+    });
+  }
+
   async clearAll(): Promise<void> {
     if (!this.db) return;
     return new Promise((resolve) => {
       try {
-        const tx = this.db!.transaction([STORE_SONGS, STORE_PLAYLISTS], 'readwrite');
+        const tx = this.db!.transaction([STORE_SONGS, STORE_PLAYLISTS, STORE_SETTINGS], 'readwrite');
         tx.objectStore(STORE_SONGS).clear();
         tx.objectStore(STORE_PLAYLISTS).clear();
+        tx.objectStore(STORE_SETTINGS).clear();
         tx.oncomplete = () => resolve();
         tx.onerror = () => resolve();
       } catch {

@@ -14,6 +14,11 @@ class AudioService {
   private onEndedCallback: (() => void) | null = null;
   private onPlayStateChangeCallback: ((isPlaying: boolean) => void) | null = null;
   private onErrorCallback: ((error: string) => void) | null = null;
+  private onVolumeChangeCallback: ((volume: number, isMuted: boolean) => void) | null = null;
+  public onVolumeChange: ((volume: number, isMuted: boolean) => void) | null = null;
+  private previousVolume: number = 0.85;
+  private isMutedState: boolean = false;
+  private playPromise: Promise<void> | null = null;
 
   constructor() {
     this.audio = new Audio();
@@ -52,16 +57,27 @@ class AudioService {
     onTimeUpdate: (time: number, duration: number) => void,
     onEnded: () => void,
     onPlayStateChange: (isPlaying: boolean) => void,
-    onError?: (error: string) => void
+    onError?: (error: string) => void,
+    onVolumeChange?: (volume: number, isMuted: boolean) => void
   ) {
     this.onTimeUpdateCallback = onTimeUpdate;
     this.onEndedCallback = onEnded;
     this.onPlayStateChangeCallback = onPlayStateChange;
     if (onError) this.onErrorCallback = onError;
+    if (onVolumeChange) this.onVolumeChangeCallback = onVolumeChange;
   }
 
   async loadSong(song: Song, autoPlay = true): Promise<void> {
     this.currentSong = song;
+
+    if (this.playPromise) {
+      try {
+        await this.playPromise;
+      } catch {
+        // Handled
+      }
+    }
+
     if (song.fileBlob && (!song.url || song.url.startsWith('blob:'))) {
       try {
         song.url = URL.createObjectURL(song.fileBlob);
@@ -69,23 +85,37 @@ class AudioService {
         // Keep current
       }
     }
+
     this.audio.src = song.url;
+    this.audio.load();
     this.updateMediaSessionMetadata(song);
 
     if (autoPlay) {
-      try {
-        await this.audio.play();
-      } catch (err) {
-        console.warn('AutoPlay blocked or failed', err);
-      }
+      await this.play();
     }
   }
 
-  play(): Promise<void> {
-    return this.audio.play();
+  async play(): Promise<void> {
+    try {
+      this.playPromise = this.audio.play();
+      await this.playPromise;
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        console.warn('AutoPlay blocked or failed', err);
+      }
+    } finally {
+      this.playPromise = null;
+    }
   }
 
-  pause(): void {
+  async pause(): Promise<void> {
+    if (this.playPromise) {
+      try {
+        await this.playPromise;
+      } catch {
+        // Handled
+      }
+    }
     this.audio.pause();
   }
 
@@ -104,7 +134,60 @@ class AudioService {
   }
 
   setVolume(volume: number): void {
-    this.audio.volume = Math.max(0, Math.min(1, volume));
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.audio.volume = clamped;
+    if (clamped > 0) {
+      this.previousVolume = clamped;
+      this.isMutedState = false;
+    } else {
+      this.isMutedState = true;
+    }
+    if (this.onVolumeChangeCallback) {
+      this.onVolumeChangeCallback(clamped, this.isMutedState);
+    }
+    if (this.onVolumeChange) {
+      this.onVolumeChange(clamped, this.isMutedState);
+    }
+  }
+
+  toggleMute(): boolean {
+    if (this.isMutedState || this.audio.volume === 0) {
+      this.unmute();
+      return false;
+    } else {
+      this.mute();
+      return true;
+    }
+  }
+
+  mute(): void {
+    if (this.audio.volume > 0) {
+      this.previousVolume = this.audio.volume;
+    }
+    this.audio.volume = 0;
+    this.isMutedState = true;
+    if (this.onVolumeChangeCallback) {
+      this.onVolumeChangeCallback(0, true);
+    }
+    if (this.onVolumeChange) {
+      this.onVolumeChange(0, true);
+    }
+  }
+
+  unmute(): void {
+    const restore = this.previousVolume > 0 ? this.previousVolume : 0.85;
+    this.audio.volume = restore;
+    this.isMutedState = false;
+    if (this.onVolumeChangeCallback) {
+      this.onVolumeChangeCallback(restore, false);
+    }
+    if (this.onVolumeChange) {
+      this.onVolumeChange(restore, false);
+    }
+  }
+
+  isMuted(): boolean {
+    return this.isMutedState || this.audio.volume === 0;
   }
 
   getVolume(): number {

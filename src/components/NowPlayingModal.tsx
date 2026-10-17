@@ -17,6 +17,7 @@ import {
   Pause,
   Volume2,
   Volume1,
+  VolumeX,
   Quote,
   ListMusic,
   Airplay,
@@ -71,7 +72,10 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
   onToggleAutoplay
 }) => {
   const [activeTab, setActiveTab] = useState<'cover' | 'lyrics' | 'queue'>('cover');
-  const [volume, setVolume] = useState<number>(0.85);
+  const [volume, setVolume] = useState<number>(audioService.getVolume());
+  const [isMuted, setIsMuted] = useState<boolean>(audioService.isMuted());
+  const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
+  const [scrubTime, setScrubTime] = useState<number>(0);
   const [colors, setColors] = useState<DominantColors>({
     primary: '#FC3C44',
     secondary: '#861657',
@@ -251,14 +255,25 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
             type="range"
             min={0}
             max={duration || 100}
-            value={currentTime}
-            onChange={(e) => onSeek(Number(e.target.value))}
+            value={isScrubbing ? scrubTime : currentTime}
+            onPointerDown={() => {
+              setIsScrubbing(true);
+              setScrubTime(currentTime);
+            }}
+            onChange={(e) => {
+              setScrubTime(Number(e.target.value));
+            }}
+            onPointerUp={() => {
+              setIsScrubbing(false);
+              onSeek(scrubTime);
+            }}
             className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none transition-all"
+            aria-label="Seek track"
           />
 
           <div className="flex justify-between text-[11px] font-semibold text-white/60 tabular-nums">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatRemainingTime(currentTime, duration)}</span>
+            <span>{formatTime(isScrubbing ? scrubTime : currentTime)}</span>
+            <span>{formatRemainingTime(isScrubbing ? scrubTime : currentTime, duration)}</span>
           </div>
         </div>
 
@@ -327,21 +342,49 @@ export const NowPlayingModal: React.FC<NowPlayingModalProps> = ({
 
         {/* Volume Slider Bar */}
         <div className="flex items-center gap-3 px-3">
-          <Volume1 className="w-4 h-4 text-white/50" />
+          <button
+            onClick={() => {
+              const muted = audioService.toggleMute();
+              setIsMuted(muted);
+              setVolume(audioService.getVolume());
+            }}
+            className="p-1 rounded-full hover:bg-white/10 active:scale-90 transition-transform"
+            aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+          >
+            {isMuted ? (
+              <VolumeX className="w-4 h-4 text-[#FA233B]" />
+            ) : (
+              <Volume1 className="w-4 h-4 text-white/50" />
+            )}
+          </button>
+
           <input
             type="range"
             min={0}
             max={1}
             step={0.01}
-            value={volume}
+            value={isMuted ? 0 : volume}
             onChange={(e) => {
               const val = Number(e.target.value);
               setVolume(val);
               audioService.setVolume(val);
+              setIsMuted(val === 0);
             }}
             className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white focus:outline-none"
+            aria-label="Volume"
           />
-          <Volume2 className="w-4 h-4 text-white/50" />
+
+          <button
+            onClick={() => {
+              audioService.setVolume(1);
+              setVolume(1);
+              setIsMuted(false);
+            }}
+            className="p-1 rounded-full hover:bg-white/10 active:scale-90 transition-transform"
+            aria-label="Max volume"
+          >
+            <Volume2 className="w-4 h-4 text-white/50" />
+          </button>
         </div>
 
         {/* Bottom Actions Row: Lyrics, AirPlay, Queue */}
