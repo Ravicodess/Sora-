@@ -62,6 +62,13 @@ class AudioService {
 
   async loadSong(song: Song, autoPlay = true): Promise<void> {
     this.currentSong = song;
+    if (song.fileBlob && (!song.url || song.url.startsWith('blob:'))) {
+      try {
+        song.url = URL.createObjectURL(song.fileBlob);
+      } catch (e) {
+        // Keep current
+      }
+    }
     this.audio.src = song.url;
     this.updateMediaSessionMetadata(song);
 

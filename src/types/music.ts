@@ -11,6 +11,8 @@ export interface Song {
   duration: number; // in seconds
   url: string; // Blob URL or remote URL
   coverUrl: string; // Base64 data URL, Blob URL, or remote URL
+  fileBlob?: Blob;
+  mediaStoreId?: number;
   lyrics?: LyricLine[];
   genre?: string;
   year?: number | string;

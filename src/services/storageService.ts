@@ -45,7 +45,19 @@ class StorageService {
         const tx = this.db!.transaction(STORE_SONGS, 'readonly');
         const store = tx.objectStore(STORE_SONGS);
         const req = store.getAll();
-        req.onsuccess = () => resolve(req.result || []);
+        req.onsuccess = () => {
+          const list = (req.result || []).map((song: Song) => {
+            if (song.fileBlob && (!song.url || song.url.startsWith('blob:'))) {
+              try {
+                song.url = URL.createObjectURL(song.fileBlob);
+              } catch (e) {
+                console.warn('Could not recreate object URL', e);
+              }
+            }
+            return song;
+          });
+          resolve(list);
+        };
         req.onerror = () => resolve([]);
       } catch {
         resolve([]);

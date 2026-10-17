@@ -227,9 +227,10 @@ export async function parseAudioFile(file: File): Promise<Song> {
     duration,
     url: fileUrl,
     coverUrl,
+    fileBlob: file,
     year,
     format: file.name.split('.').pop()?.toUpperCase() || 'AUDIO',
-    bitrate: 'Local Lossless • MediaStore Audio',
+    bitrate: 'Local Lossless • Sora Audio',
     isLocal: true,
     isFavorite: false,
     playCount: 0,
@@ -239,7 +240,7 @@ export async function parseAudioFile(file: File): Promise<Song> {
       { time: 3, text: `Artist: ${artist}` },
       { time: 6, text: `Album: ${album}` },
       { time: 10, text: "Tap lyrics button to toggle karaoke view" },
-      { time: 15, text: "Local storage playback in Masti Music" }
+      { time: 15, text: "Local storage playback in Sora" }
     ]
   };
 }
