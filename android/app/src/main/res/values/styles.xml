@@ -1,11 +1,11 @@
 <resources>
-    <style name="Theme.MastiMusic" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.SoraMusic" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">#000000</item>
         <item name="android:navigationBarColor">#000000</item>
         <item name="android:windowBackground">#000000</item>
     </style>
 
-    <style name="Theme.MastiMusic.Fullscreen" parent="Theme.MastiMusic">
+    <style name="Theme.SoraMusic.Fullscreen" parent="Theme.SoraMusic">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
